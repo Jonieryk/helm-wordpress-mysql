@@ -11,6 +11,6 @@ spec:
       name: mysql
   selector:
     {{- include "wordpress-mysql.selectorLabels" . | nindent 4 }}
-    app: wordpress
-    tier: backend
-  clusterIP: None
+    #app: wordpress
+    #tier: backend
+  clusterIP: ""

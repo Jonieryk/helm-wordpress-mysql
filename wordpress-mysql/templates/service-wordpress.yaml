@@ -6,11 +6,12 @@ metadata:
   labels:
     {{- include "wordpress-mysql.labels" . | nindent 4 }}
 spec:
+  type: LoadBalancer   
   ports:
     - port: {{ .Values.serviceWordpress.port }}
       name: wordpress
   selector:
     {{- include "wordpress-mysql.selectorLabels" . | nindent 4 }}
-    app: wordpress
-    tier: frontend
-  clusterIP: None
+    #app: wordpress
+    #tier: backend
+  clusterIP: ""
