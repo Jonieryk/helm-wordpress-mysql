@@ -11,7 +11,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "wordpress-mysql.selectorLabels" . | nindent 6 }}
+      app: wordpress
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,10 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "wordpress-mysql.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        app: wordpress
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -30,7 +27,7 @@ spec:
           imagePullPolicy: {{ .Values.imageWordpress.pullPolicy }}
           env:
           - name: WORDPRESS_DB_HOST
-            value: wordpress-mysql
+            value: wordpress-mysql-mysql
           - name: WORDPRESS_DB_PASSWORD
             valueFrom:
               secretKeyRef:

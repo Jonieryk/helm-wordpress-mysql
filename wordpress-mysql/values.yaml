@@ -138,3 +138,17 @@ namespace: dev
 
 mysql:
   password: "haslo"
+
+phpmyadmin:
+  enabled: true  # Set to true to enable phpMyAdmin
+  replicaCount: 1
+  image:
+    repository: phpmyadmin
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+  env:
+    MYSQL_HOST: wordpress-mysql-mysql
+    MYSQL_PORT: "3306"  # Ensure the value is quoted for YAML compatibility
