@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "wordpress-mysql.fullname" . }}-mysql
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "wordpress-mysql.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.serviceMysql.port }}
+      name: mysql
+  selector:
+    {{- include "wordpress-mysql.selectorLabels" . | nindent 4 }}
+    app: wordpress
+    tier: backend
+  clusterIP: None

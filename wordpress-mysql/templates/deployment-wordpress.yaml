@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wordpress-mysql.fullname" . }}-wordpress
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "wordpress-mysql.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "wordpress-mysql.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "wordpress-mysql.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.imageWordpress.repository }}:{{ .Values.imageWordpress.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imageWordpress.pullPolicy }}
+          env:
+          - name: WORDPRESS_DB_HOST
+            value: wordpress-mysql
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-pass
+                key: password
+          - name: WORDPRESS_DB_USER
+            value: wordpress
+          ports:
+          - name: wordpress
+            containerPort: {{ .Values.serviceWordpress.port }}
+            protocol: TCP
+            livenessProbe:
+              {{- toYaml .Values.livenessProbe | nindent 12 }}
+            readinessProbe:
+              {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+          - name: wordpress-persistent-storage
+            mountPath: /var/www/html
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wp-pv-claim
+{{- end }}
+
